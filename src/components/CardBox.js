@@ -70,7 +70,7 @@ const CardBox = () => {
           </Grid>
           <Grid item xs={12} md={3}>
             <label className='insideTitle'>Start Date</label>
-            <TextField
+            <input
               id='date'
               type='date'
               value={startDate}
@@ -78,38 +78,25 @@ const CardBox = () => {
                 setStartDate(e.target.value);
                 // console.log(e.target.value)
               }}
-              fullWidth
-              variant='outlined'
+              style={{ width: '100%', height: '50px' }}
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <label className='insideTitle'>End Date</label>
             {/* <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} /> */}
-            <TextField
+            <input
               id='date'
               type='date'
               defaultValue=''
               value={endDate}
+              min={startDate}
               onChange={(e) => {
                 setEndDate(e.target.value);
                 // console.log(e.target.value)
               }}
-              fullWidth
-              variant='outlined'
+              style={{ width: '100%', height: '50px' }}
             />
           </Grid>
-          {/* <Grid item xs={4} md={4}>
-          Key Mearsures                   
-        </Grid>
-        <Grid item xs={2} md={2} style = {{ textAlign: "right"}}>
-          Add additional key measures                 
-        </Grid>
-        <Grid item xs={12} md={12}>
-            
-        </Grid>
-        <Grid item xs={6} md={6}>               
-          <TextField fullWidth label="" variant="outlined" />
-        </Grid> */}
           <Grid container item xs={6} md={6} spacing={1}>
             <Grid item xs={7} md={7}>
               <label className='insideTitle'>Key Mearsures </label>
@@ -209,14 +196,6 @@ const CardBox = () => {
               ''
             )}
           </Grid>
-          {new Date(startDate).getTime() > new Date(endDate).getTime() ? (
-            <Grid xs={6} md={6} style={{ textAlign: 'center', color: 'red' }}>
-              End date cannot before start date!
-            </Grid>
-          ) : (
-            ''
-          )}
-          {/* {console.log("chongxin",bef)} */}
         </Grid>
       </div>
     </div>
