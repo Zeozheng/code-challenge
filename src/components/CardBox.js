@@ -18,9 +18,9 @@ const CardBox = (props) => {
   const [localData, setLocalData] = useStateWithLocalStorage(
     'localData',
     JSON.stringify([
-      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] },
-      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] },
-      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] }
+      { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
+      { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
+      { startDate: '', endDate: '', objective: '', keyMeasures: [''] }
     ])
   );
 
@@ -35,22 +35,24 @@ const CardBox = (props) => {
   const [keyMeasures, setKeyMeasures] = useStateWithLocalStorage('keyMeasures', ['']);
   //console.log('111', localData);
   const primaryColor = { color: '#25397D', fontSize: '12px' };
-  const objNumber = props.count1;
-
-  //console.log(objNumber);
+  // const objNumber = props.i ? props.i + 1 : 0;
 
   const handleMeasureAdd = () => {
     if (count < 2) {
       setCount(count + 1);
-      setKeyMeasures([...keyMeasures, '']);
+      console.log('111', localData);
+      const data = JSON.parse(localData);
+      //console.log('op', data, localData, ['123'].push(''));
+      data[0]['keyMeasures'].push('');
+      const result = JSON.stringify(data);
+      // console.log('gg', result);
+      setLocalData(result);
     } else {
       setMaxMeasures(1);
     }
   };
-  // console.log(count);
-  const checkLog = () => {
-    console.log('made');
-  };
+
+  console.log('cccc', count);
 
   return (
     <div className='box'>
@@ -58,7 +60,7 @@ const CardBox = (props) => {
         <Grid container spacing={1}>
           <Grid item xs={12} md={6}>
             <label htmlFor='Objective' className='insideTitle'>
-              Objective {objNumber}
+              Objective 1
             </label>
             <TextField
               fullWidth
@@ -131,69 +133,36 @@ const CardBox = (props) => {
             </Grid>
             )))
             } */}
-            {console.log('keyMeasures', keyMeasures)}
-            {typeof keyMeasures != 'string'
-              ? keyMeasures.map((a, i) => (
-                  <Grid
-                    xs={12}
-                    md={12}
-                    className='list-item'
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '10px'
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      variant='outlined'
-                      type='text'
-                      value={a}
-                      onChange={(e) => {
-                        const newKeyMeasure = keyMeasures;
-                        newKeyMeasure[i] = e.target.value;
-                        setKeyMeasures([...newKeyMeasure]);
-                        const aaa = localData;
-                        aaa[0]['keyMeasures'][i] = e.target.value;
-                        console.log('aaa', aaa);
-                      }}
-                      required
-                    />
-                  </Grid>
-                ))
-              : keyMeasures.split(',').map((a, i) => (
-                  <Grid
-                    xs={12}
-                    md={12}
-                    className='list-item'
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '10px'
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      variant='outlined'
-                      type='text'
-                      value={a}
-                      onChange={(e) => {
-                        console.log('mlgb');
-                        const newKeyMeasure = keyMeasures.split(',');
-                        newKeyMeasure[i] = e.target.value;
-                        setKeyMeasures([...newKeyMeasure]);
-                        const aaa = localData;
-                        aaa[0]['keyMeasures'][i] = e.target.value;
-                        console.log('aaa', aaa);
-                      }}
-                      required
-                    />
-                  </Grid>
-                ))}
+            {console.log('keyMeasures', JSON.parse(localData)[0]['keyMeasures'])}
+            {JSON.parse(localData)[0]['keyMeasures'].map((a, i) => (
+              <Grid
+                xs={12}
+                md={12}
+                className='list-item'
+                key={i}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '10px'
+                }}
+              >
+                <TextField
+                  fullWidth
+                  variant='outlined'
+                  type='text'
+                  value={a}
+                  onChange={(e) => {
+                    const data = JSON.parse(localData);
+                    data[0]['keyMeasures'][i] = e.target.value;
+                    const result = JSON.stringify(data);
+                    //console.log('gg', result);
+                    setLocalData(result);
+                  }}
+                  required
+                />
+              </Grid>
+            ))}
 
             <Button variant='contained' style={{ backgroundColor: '#25397D', marginTop: '5px', color: 'white' }}>
               Update

@@ -40,10 +40,10 @@ const Objective = () => {
       <br />
       <Tab data={data} />
       {/* {objectives.map((a, i) => ( */}
-      <CardBox count1={count1} style={{ marginBottom: '20px' }}></CardBox>
+      <CardBox count1={count1 - 1} style={{ marginBottom: '20px' }}></CardBox>
       {/* ))} */}
       {[...Array(count1 - 1)].map((_, i) => (
-        <CardBox key={i - 1} />
+        <CardBox key={i - 1} i={i} />
       ))}
       <Button
         variant='contained'
