@@ -14,28 +14,32 @@ const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
   return [value, setValue];
 };
 
-const CardBox = () => {
+const CardBox = (props) => {
+  const [localData, setLocalData] = useStateWithLocalStorage(
+    'localData',
+    JSON.stringify([
+      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] },
+      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] },
+      { startDate: '', endDate: '', objective: '', count: 0, keyMeasures: [''] }
+    ])
+  );
+
   const [startDate, setStartDate] = useStateWithLocalStorage('startDate', '');
   const [endDate, setEndDate] = useStateWithLocalStorage('endDate', '');
   const [objective, setObjective] = useStateWithLocalStorage('objective', '');
   const [measureInput, setMeasureInput] = useStateWithLocalStorage('measure', ['']);
-  const [measureList, setMeasureList] = useState([{ measure: '' }]);
+  // const [measureList, setMeasureList] = useState([{ measure: '' }]);
   const maxObj = 3;
   const [count, setCount] = useState(0);
   const [maxMeasures, setMaxMeasures] = useState(0);
   const [keyMeasures, setKeyMeasures] = useStateWithLocalStorage('keyMeasures', ['']);
-
+  //console.log('111', localData);
   const primaryColor = { color: '#25397D', fontSize: '12px' };
+  const objNumber = props.count1;
+
+  //console.log(objNumber);
 
   const handleMeasureAdd = () => {
-    if (count < 2) {
-      setCount(count + 1);
-      setMeasureList([...measureList, ['']]);
-    } else {
-      setMaxMeasures(1);
-    }
-  };
-  const handleMeasureAdd2 = () => {
     if (count < 2) {
       setCount(count + 1);
       setKeyMeasures([...keyMeasures, '']);
@@ -43,11 +47,9 @@ const CardBox = () => {
       setMaxMeasures(1);
     }
   };
-  const handleMeasureChange = (e, index) => {
-    const { name, value } = e.target;
-    const list = [...measureList];
-    list[index][name] = value;
-    setMeasureList(list);
+  // console.log(count);
+  const checkLog = () => {
+    console.log('made');
   };
 
   return (
@@ -56,15 +58,18 @@ const CardBox = () => {
         <Grid container spacing={1}>
           <Grid item xs={12} md={6}>
             <label htmlFor='Objective' className='insideTitle'>
-              Objective 1
+              Objective {objNumber}
             </label>
             <TextField
               fullWidth
               type='text'
               variant='outlined'
-              value={objective}
+              value={JSON.parse(localData)[0]['objective']}
               onChange={(e) => {
-                setObjective(e.target.value);
+                const data = JSON.parse(localData);
+                data[0]['objective'] = e.target.value;
+                const result = JSON.stringify(data);
+                setLocalData(result);
               }}
             />
           </Grid>
@@ -73,10 +78,13 @@ const CardBox = () => {
             <input
               id='date'
               type='date'
-              value={startDate}
+              value={JSON.parse(localData)[0]['startDate']}
               onChange={(e) => {
-                setStartDate(e.target.value);
-                // console.log(e.target.value)
+                //setStartDate(e.target.value);
+                const data = JSON.parse(localData);
+                data[0]['startDate'] = e.target.value;
+                const result = JSON.stringify(data);
+                setLocalData(result);
               }}
               style={{ width: '100%', height: '50px' }}
             />
@@ -88,10 +96,13 @@ const CardBox = () => {
               id='date'
               type='date'
               defaultValue=''
-              value={endDate}
-              min={startDate}
+              value={JSON.parse(localData)[0]['endDate']}
+              min={JSON.parse(localData)[0]['startDate']}
               onChange={(e) => {
-                setEndDate(e.target.value);
+                const data = JSON.parse(localData);
+                data[0]['endDate'] = e.target.value;
+                const result = JSON.stringify(data);
+                setLocalData(result);
                 // console.log(e.target.value)
               }}
               style={{ width: '100%', height: '50px' }}
@@ -102,14 +113,7 @@ const CardBox = () => {
               <label className='insideTitle'>Key Mearsures </label>
             </Grid>
             <Grid item xs={5} md={5}>
-              <Button
-                style={primaryColor}
-                // onClick={() => setCount(count + 1)}
-                onClick={
-                  //handleMeasureAdd
-                  handleMeasureAdd2
-                }
-              >
+              <Button style={primaryColor} onClick={handleMeasureAdd}>
                 Add additional key measures <AddCircleIcon style={{ marginLeft: '5px', display: 'flex', textAlignVertical: 'center' }}></AddCircleIcon>
               </Button>
             </Grid>
@@ -151,13 +155,15 @@ const CardBox = () => {
                         const newKeyMeasure = keyMeasures;
                         newKeyMeasure[i] = e.target.value;
                         setKeyMeasures([...newKeyMeasure]);
+                        const aaa = localData;
+                        aaa[0]['keyMeasures'][i] = e.target.value;
+                        console.log('aaa', aaa);
                       }}
                       required
                     />
                   </Grid>
                 ))
-              : //console.log("nimasile")}
-                keyMeasures.split(',').map((a, i) => (
+              : keyMeasures.split(',').map((a, i) => (
                   <Grid
                     xs={12}
                     md={12}
@@ -176,9 +182,13 @@ const CardBox = () => {
                       type='text'
                       value={a}
                       onChange={(e) => {
+                        console.log('mlgb');
                         const newKeyMeasure = keyMeasures.split(',');
                         newKeyMeasure[i] = e.target.value;
                         setKeyMeasures([...newKeyMeasure]);
+                        const aaa = localData;
+                        aaa[0]['keyMeasures'][i] = e.target.value;
+                        console.log('aaa', aaa);
                       }}
                       required
                     />
