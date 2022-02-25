@@ -23,6 +23,7 @@ const Objective = () => {
   const [count1, setCount1] = useState(1);
   const [objectives, setObjectives] = useStateWithLocalStorage('objectives', ['']);
   const [maxObjectives, setMaxObjectives] = useState(0);
+  const [objectiveData, setObjectiveData] = useState([]);
 
   const handleMeasureAdd = () => {
     if (count1 < 3) {
@@ -34,16 +35,27 @@ const Objective = () => {
   };
   //console.log(count1);
 
+  useEffect(() => {
+    const localData = localStorage.getItem('objectiveData');
+    if (!localData) {
+      return;
+    }
+
+    try {
+      setObjectiveData(JSON.parse(localData));
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
     <React.Fragment style={{ marginTop: '20rpx', marginLeft: '10rpx' }}>
       <h1 className='title'>Set Security Strategy </h1>
       <br />
       <Tab data={data} />
-      {/* {objectives.map((a, i) => ( */}
       <CardBox count1={count1 - 1} style={{ marginBottom: '20px' }}></CardBox>
-      {/* ))} */}
-      {[...Array(count1 - 1)].map((_, i) => (
-        <CardBox key={i - 1} i={i} />
+      {(objectiveData || []).map((objective, index) => (
+        <CardBox data={objective} key={index} index={index} />
       ))}
       <Button
         variant='contained'

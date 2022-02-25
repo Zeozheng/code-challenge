@@ -14,7 +14,7 @@ const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
   return [value, setValue];
 };
 
-const CardBox = (props) => {
+const CardBox = ({ data, index }) => {
   const [localData, setLocalData] = useStateWithLocalStorage(
     'localData',
     JSON.stringify([
@@ -24,18 +24,15 @@ const CardBox = (props) => {
     ])
   );
 
-  const [startDate, setStartDate] = useStateWithLocalStorage('startDate', '');
-  const [endDate, setEndDate] = useStateWithLocalStorage('endDate', '');
-  const [objective, setObjective] = useStateWithLocalStorage('objective', '');
-  const [measureInput, setMeasureInput] = useStateWithLocalStorage('measure', ['']);
-  // const [measureList, setMeasureList] = useState([{ measure: '' }]);
-  const maxObj = 3;
-  const [count, setCount] = useState(0);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [objectiveName, setObjectiveName] = useState('');
+  const [keyMeasures, setKeyMeasures] = useState(['']);
+
   const [maxMeasures, setMaxMeasures] = useState(0);
-  const [keyMeasures, setKeyMeasures] = useStateWithLocalStorage('keyMeasures', ['']);
-  //console.log('111', localData);
+  const [count, setCount] = useState(0);
+
   const primaryColor = { color: '#25397D', fontSize: '12px' };
-  // const objNumber = props.i ? props.i + 1 : 0;
 
   const handleMeasureAdd = () => {
     if (count < 2) {
@@ -52,7 +49,24 @@ const CardBox = (props) => {
     }
   };
 
-  console.log('cccc', count);
+  const handleUpdate = () => {
+    if (new Date(startDate) >= new Date(endDate)) {
+      console.error('Start date can not be greater or equal to end date');
+      return;
+    } else if (!keyMeasures.length) {
+      console.error('Atleast one key measure required');
+      return;
+    }
+
+    const localObjective = {
+      startDate,
+      endDate,
+      objectiveName,
+      keyMeasures
+    };
+
+    localStorage.setItem('localData', JSON.stringify(localObjective));
+  };
 
   return (
     <div className='box'>
@@ -60,54 +74,25 @@ const CardBox = (props) => {
         <Grid container spacing={1}>
           <Grid item xs={12} md={6}>
             <label htmlFor='Objective' className='insideTitle'>
-              Objective 1
+              Objective {(index || 0) + 1}
             </label>
-            <TextField
-              fullWidth
-              type='text'
-              variant='outlined'
-              value={JSON.parse(localData)[0]['objective']}
-              onChange={(e) => {
-                const data = JSON.parse(localData);
-                data[0]['objective'] = e.target.value;
-                const result = JSON.stringify(data);
-                setLocalData(result);
-              }}
-            />
+            <TextField fullWidth type='text' variant='outlined' value={objectiveName} onChange={(e) => setObjectiveName(e.target.value)} />
           </Grid>
           <Grid item xs={12} md={3}>
             <label className='insideTitle'>Start Date</label>
-            <input
-              id='date'
-              type='date'
-              value={JSON.parse(localData)[0]['startDate']}
-              onChange={(e) => {
-                //setStartDate(e.target.value);
-                const data = JSON.parse(localData);
-                data[0]['startDate'] = e.target.value;
-                const result = JSON.stringify(data);
-                setLocalData(result);
-              }}
-              style={{ width: '100%', height: '50px' }}
-            />
+            <input id='date' type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: '100%', height: '50px' }} />
           </Grid>
           <Grid item xs={12} md={3}>
             <label className='insideTitle'>End Date</label>
-            {/* <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} /> */}
             <input
               id='date'
               type='date'
               defaultValue=''
-              value={JSON.parse(localData)[0]['endDate']}
-              min={JSON.parse(localData)[0]['startDate']}
-              onChange={(e) => {
-                const data = JSON.parse(localData);
-                data[0]['endDate'] = e.target.value;
-                const result = JSON.stringify(data);
-                setLocalData(result);
-                // console.log(e.target.value)
-              }}
+              min={startDate}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               style={{ width: '100%', height: '50px' }}
+              disabled={!startDate}
             />
           </Grid>
           <Grid container item xs={6} md={6} spacing={1}>
@@ -120,26 +105,12 @@ const CardBox = (props) => {
               </Button>
             </Grid>
 
-            {/* {
-            (measureList.map((singleMeasure, index)=>(
-              <Grid key = {index} item xs={12} md={12}>               
-              <TextField fullWidth 
-              name = "measure"
-              variant="outlined"       
-              // value = {singleMeasure.measure} 
-              value = {measureInput}
-              onChange = {(e) => {setMeasureInput(e.target.value)}} 
-              />
-            </Grid>
-            )))
-            } */}
-            {console.log('keyMeasures', JSON.parse(localData)[0]['keyMeasures'])}
-            {JSON.parse(localData)[0]['keyMeasures'].map((a, i) => (
+            {keyMeasures.map((measure, index) => (
               <Grid
                 xs={12}
                 md={12}
                 className='list-item'
-                key={i}
+                key={`key-measure-${index}`}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -147,24 +118,11 @@ const CardBox = (props) => {
                   marginBottom: '10px'
                 }}
               >
-                <TextField
-                  fullWidth
-                  variant='outlined'
-                  type='text'
-                  value={a}
-                  onChange={(e) => {
-                    const data = JSON.parse(localData);
-                    data[0]['keyMeasures'][i] = e.target.value;
-                    const result = JSON.stringify(data);
-                    //console.log('gg', result);
-                    setLocalData(result);
-                  }}
-                  required
-                />
+                <TextField fullWidth variant='outlined' type='text' value={measure} required />
               </Grid>
             ))}
 
-            <Button variant='contained' style={{ backgroundColor: '#25397D', marginTop: '5px', color: 'white' }}>
+            <Button variant='contained' style={{ backgroundColor: '#25397D', marginTop: '5px', color: 'white' }} onClick={handleUpdate}>
               Update
             </Button>
             {maxMeasures === 1 ? (
