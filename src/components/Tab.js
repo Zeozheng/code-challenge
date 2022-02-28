@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import './styles.css';
 
 const Tab = (props) => {
-  const [visibleTab, setVisibleTab] = React.useState(props.data[0].id);
+  const [visibleTab, setVisibleTab] = React.useState(props.tab[0].id);
 
-  const listTitles = props.data.map((item) => (
+  const listTitles = props.tab.map((item) => (
     <li onClick={() => setVisibleTab(item.id)} className={visibleTab === item.id ? 'tab-title tab-title--active' : 'tab-title'}>
       {item.tabTitle}
     </li>
   ));
-  const listContent = props.data.map((item) => <p style={visibleTab === item.id ? {} : { display: 'none' }}>{item.tabContent}</p>);
+  const listContent = props.tab.map((item) => <p style={visibleTab === item.id ? {} : { display: 'none' }}>{item.tabContent}</p>);
 
   return (
     <div className='tabs'>

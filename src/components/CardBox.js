@@ -1,33 +1,33 @@
 import { Button, Grid, TextField } from '@material-ui/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './styles.css';
 
-const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
-  // convert everything to a string!
-  const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
-  //console.log(value,"111")
-  useEffect(() => {
-    localStorage.setItem(localStorageKey, value);
-  }, [value, localStorageKey]);
+// const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
+//   // convert everything to a string!
+//   const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
+//   //console.log(value,"111")
+//   useEffect(() => {
+//     localStorage.setItem(localStorageKey, value);
+//   }, [value, localStorageKey]);
 
-  return [value, setValue];
-};
+//   return [value, setValue];
+// };
 
 const CardBox = ({ data, index }) => {
-  const [localData, setLocalData] = useStateWithLocalStorage(
-    'localData',
-    JSON.stringify([
-      { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
-      { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
-      { startDate: '', endDate: '', objective: '', keyMeasures: [''] }
-    ])
-  );
+  // const [localData, setLocalData] = useStateWithLocalStorage(
+  //   'localData',
+  //   JSON.stringify([
+  //     { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
+  //     { startDate: '', endDate: '', objective: '', keyMeasures: [''] },
+  //     { startDate: '', endDate: '', objective: '', keyMeasures: [''] }
+  //   ])
+  // );
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [objectiveName, setObjectiveName] = useState('');
-  const [keyMeasures, setKeyMeasures] = useState(['']);
+  const [keyMeasures, setKeyMeasures] = useState([]);
 
   const [maxMeasures, setMaxMeasures] = useState(0);
   const [count, setCount] = useState(0);
@@ -35,15 +35,20 @@ const CardBox = ({ data, index }) => {
   const primaryColor = { color: '#25397D', fontSize: '12px' };
 
   const handleMeasureAdd = () => {
-    if (count < 2) {
+    // const keyMeasures = {
+    //   keyMeasures: []
+    // };
+    if (count < 3) {
       setCount(count + 1);
-      console.log('111', localData);
-      const data = JSON.parse(localData);
-      //console.log('op', data, localData, ['123'].push(''));
-      data[0]['keyMeasures'].push('');
-      const result = JSON.stringify(data);
-      // console.log('gg', result);
-      setLocalData(result);
+      // // console.log('111', localData);
+      // const data = JSON.parse(localData);
+      // //console.log('op', data, localData, ['123'].push(''));
+      // data[0]['keyMeasures'].push('');
+      // const result = JSON.stringify(data);
+      // // console.log('gg', result);
+      // setLocalData(result);
+      localStorage.setItem('keyMeasures', JSON.stringify(keyMeasures));
+      setKeyMeasures([...keyMeasures, '']);
     } else {
       setMaxMeasures(1);
     }
@@ -66,6 +71,7 @@ const CardBox = ({ data, index }) => {
     };
 
     localStorage.setItem('localData', JSON.stringify(localObjective));
+    // console.log(localStorage);
   };
 
   return (
@@ -104,7 +110,7 @@ const CardBox = ({ data, index }) => {
                 Add additional key measures <AddCircleIcon style={{ marginLeft: '5px', display: 'flex', textAlignVertical: 'center' }}></AddCircleIcon>
               </Button>
             </Grid>
-
+            {/* {console.log('222', keyMeasures)} */}
             {keyMeasures.map((measure, index) => (
               <Grid
                 xs={12}
@@ -118,7 +124,19 @@ const CardBox = ({ data, index }) => {
                   marginBottom: '10px'
                 }}
               >
-                <TextField fullWidth variant='outlined' type='text' value={measure} required />
+                <TextField
+                  fullWidth
+                  variant='outlined'
+                  type='text'
+                  value={measure}
+                  onChange={(e) => {
+                    // console.log('111', e.target.value);
+                    const newKeyMeasure = keyMeasures;
+                    newKeyMeasure[index] = e.target.value;
+                    setKeyMeasures([...newKeyMeasure]);
+                  }}
+                  required
+                />
               </Grid>
             ))}
 

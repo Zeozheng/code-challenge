@@ -4,30 +4,31 @@ import React, { useEffect, useState } from 'react';
 import CardBox from './CardBox';
 import Tab from './Tab';
 
-const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
-  // convert everything to a string!
-  const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
-  //console.log(value,"111")
-  useEffect(() => {
-    localStorage.setItem(localStorageKey, value);
-  }, [value, localStorageKey]);
+// const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
+//   // convert everything to a string!
+//   const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
+//   //console.log(value,"111")
+//   useEffect(() => {
+//     localStorage.setItem(localStorageKey, value);
+//   }, [value, localStorageKey]);
 
-  return [value, setValue];
-};
+//   return [value, setValue];
+// };
 
 const Objective = () => {
-  const data = [
+  const tab = [
     { id: '1', tabTitle: 'Mission & Vision', tabContent: '' },
     { id: '2', tabTitle: 'Strategic Business Objectives', tabContent: '' }
   ];
-  const [count1, setCount1] = useState(1);
-  const [objectives, setObjectives] = useStateWithLocalStorage('objectives', ['']);
+  const [count1, setCount1] = useState(0);
+  const [objectives, setObjectives] = useState([]);
   const [maxObjectives, setMaxObjectives] = useState(0);
   const [objectiveData, setObjectiveData] = useState([]);
 
   const handleMeasureAdd = () => {
     if (count1 < 3) {
       setCount1(count1 + 1);
+      localStorage.setItem('Objectives', JSON.stringify(objectives));
       setObjectives([...objectives, '']);
     } else {
       setMaxObjectives(1);
@@ -36,13 +37,16 @@ const Objective = () => {
   //console.log(count1);
 
   useEffect(() => {
-    const localData = localStorage.getItem('objectiveData');
+    const localData = localStorage.getItem('localData');
+
     if (!localData) {
       return;
     }
 
     try {
-      setObjectiveData(JSON.parse(localData));
+      const local = JSON.parse(localData);
+      setObjectiveData([local]);
+      console.log(local, '222222');
     } catch (error) {
       console.error(error);
     }
@@ -52,7 +56,7 @@ const Objective = () => {
     <React.Fragment style={{ marginTop: '20rpx', marginLeft: '10rpx' }}>
       <h1 className='title'>Set Security Strategy </h1>
       <br />
-      <Tab data={data} />
+      <Tab tab={tab} />
       <CardBox count1={count1 - 1} style={{ marginBottom: '20px' }}></CardBox>
       {(objectiveData || []).map((objective, index) => (
         <CardBox data={objective} key={index} index={index} />
