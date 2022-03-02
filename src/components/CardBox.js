@@ -1,20 +1,9 @@
 import { Button, Grid, TextField } from '@material-ui/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.css';
 
-// const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
-//   // convert everything to a string!
-//   const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
-//   //console.log(value,"111")
-//   useEffect(() => {
-//     localStorage.setItem(localStorageKey, value);
-//   }, [value, localStorageKey]);
-
-//   return [value, setValue];
-// };
-
-const CardBox = ({ data, index }) => {
+const CardBox = ({ objective, index }) => {
   // const [localData, setLocalData] = useStateWithLocalStorage(
   //   'localData',
   //   JSON.stringify([
@@ -28,11 +17,25 @@ const CardBox = ({ data, index }) => {
   const [endDate, setEndDate] = useState('');
   const [objectiveName, setObjectiveName] = useState('');
   const [keyMeasures, setKeyMeasures] = useState([]);
-
   const [maxMeasures, setMaxMeasures] = useState(0);
   const [count, setCount] = useState(0);
+  const [localData, setLocalData] = useState({});
 
   const primaryColor = { color: '#25397D', fontSize: '12px' };
+
+  // console.log(index, 'what is index');
+
+  useEffect(() => {
+    if (!objective) {
+      return;
+    }
+    const { objectiveName, startDate, endDate } = objective || {};
+    console.log({ objective });
+    setKeyMeasures(objective.keyMeasures);
+    setStartDate(startDate);
+    setEndDate(endDate);
+    setObjectiveName(objectiveName);
+  }, [objective]);
 
   const handleMeasureAdd = () => {
     // const keyMeasures = {
@@ -40,14 +43,7 @@ const CardBox = ({ data, index }) => {
     // };
     if (count < 3) {
       setCount(count + 1);
-      // // console.log('111', localData);
-      // const data = JSON.parse(localData);
-      // //console.log('op', data, localData, ['123'].push(''));
-      // data[0]['keyMeasures'].push('');
-      // const result = JSON.stringify(data);
-      // // console.log('gg', result);
-      // setLocalData(result);
-      localStorage.setItem('keyMeasures', JSON.stringify(keyMeasures));
+
       setKeyMeasures([...keyMeasures, '']);
     } else {
       setMaxMeasures(1);
@@ -55,23 +51,31 @@ const CardBox = ({ data, index }) => {
   };
 
   const handleUpdate = () => {
-    if (new Date(startDate) >= new Date(endDate)) {
-      console.error('Start date can not be greater or equal to end date');
-      return;
-    } else if (!keyMeasures.length) {
-      console.error('Atleast one key measure required');
-      return;
-    }
+    // if (new Date(startDate) >= new Date(endDate)) {
+    //   console.error('Start date can not be greater or equal to end date');
+    //   return;
+    // } else if (!keyMeasures.length) {
+    //   console.error('Atleast one key measure required');
+    //   return;
+    // }
 
     const localObjective = {
+      id: index || 0,
       startDate,
       endDate,
       objectiveName,
       keyMeasures
     };
 
-    localStorage.setItem('localData', JSON.stringify(localObjective));
-    // console.log(localStorage);
+    const localObjectives = JSON.parse(localStorage.getItem('Objective')) || [];
+    const objectiveExists = localObjectives.find((objective) => objective?.id === index);
+    if (!objectiveExists) {
+      // This just adds
+      localObjectives.push(localObjective);
+    } else {
+      localObjectives[index] = localObjective;
+    }
+    localStorage.setItem('Objective', JSON.stringify(localObjectives));
   };
 
   return (
@@ -82,7 +86,18 @@ const CardBox = ({ data, index }) => {
             <label htmlFor='Objective' className='insideTitle'>
               Objective {(index || 0) + 1}
             </label>
-            <TextField fullWidth type='text' variant='outlined' value={objectiveName} onChange={(e) => setObjectiveName(e.target.value)} />
+            <TextField
+              fullWidth
+              type='text'
+              variant='outlined'
+              // value={localData?.objectiveName || ''}
+              // onChange={(e) => {
+              //   console.log(localData.objectiveName, 'lol');
+              //   setLocalData({ objectiveName: e.target.value });
+              // }}
+              value={objectiveName}
+              onChange={(e) => setObjectiveName(e.target.value)}
+            />
           </Grid>
           <Grid item xs={12} md={3}>
             <label className='insideTitle'>Start Date</label>
@@ -111,12 +126,12 @@ const CardBox = ({ data, index }) => {
               </Button>
             </Grid>
             {/* {console.log('222', keyMeasures)} */}
-            {keyMeasures.map((measure, index) => (
+            {keyMeasures.map((measure, ind) => (
               <Grid
                 xs={12}
                 md={12}
                 className='list-item'
-                key={`key-measure-${index}`}
+                key={`key-measure-${ind}`}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -132,7 +147,7 @@ const CardBox = ({ data, index }) => {
                   onChange={(e) => {
                     // console.log('111', e.target.value);
                     const newKeyMeasure = keyMeasures;
-                    newKeyMeasure[index] = e.target.value;
+                    newKeyMeasure[ind] = e.target.value;
                     setKeyMeasures([...newKeyMeasure]);
                   }}
                   required

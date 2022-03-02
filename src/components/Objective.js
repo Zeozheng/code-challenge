@@ -4,32 +4,33 @@ import React, { useEffect, useState } from 'react';
 import CardBox from './CardBox';
 import Tab from './Tab';
 
-// const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
-//   // convert everything to a string!
-//   const [value, setValue] = useState(localStorage.getItem(localStorageKey) || defaultValue);
-//   //console.log(value,"111")
-//   useEffect(() => {
-//     localStorage.setItem(localStorageKey, value);
-//   }, [value, localStorageKey]);
-
-//   return [value, setValue];
-// };
-
 const Objective = () => {
   const tab = [
     { id: '1', tabTitle: 'Mission & Vision', tabContent: '' },
     { id: '2', tabTitle: 'Strategic Business Objectives', tabContent: '' }
   ];
   const [count1, setCount1] = useState(0);
-  const [objectives, setObjectives] = useState([]);
+  // const [objectives, setObjectives] = useState([]);
   const [maxObjectives, setMaxObjectives] = useState(0);
   const [objectiveData, setObjectiveData] = useState([]);
 
-  const handleMeasureAdd = () => {
+  const handleObjectiveAdd = () => {
     if (count1 < 3) {
       setCount1(count1 + 1);
-      localStorage.setItem('Objectives', JSON.stringify(objectives));
-      setObjectives([...objectives, '']);
+      // console.log(count1, '11111111');
+      const objectiveData = JSON.parse(localStorage.getItem('Objective'));
+
+      const defaultData = {
+        id: objectiveData.length,
+        startDate: '',
+        endDate: '',
+        objectiveName: '',
+        keyMeasures: []
+      };
+      setObjectiveData([...objectiveData, defaultData]);
+      localStorage.setItem('Objective', JSON.stringify([...objectiveData, defaultData]));
+
+      console.log(objectiveData, 'what is in the objective');
     } else {
       setMaxObjectives(1);
     }
@@ -37,39 +38,43 @@ const Objective = () => {
   //console.log(count1);
 
   useEffect(() => {
-    const localData = localStorage.getItem('localData');
-
-    if (!localData) {
-      return;
-    }
-
     try {
-      const local = JSON.parse(localData);
-      setObjectiveData([local]);
-      console.log(local, '222222');
+      const localData = JSON.parse(localStorage.getItem('Objective'));
+      if (!localData) {
+        return;
+      }
+      setObjectiveData(localData);
     } catch (error) {
       console.error(error);
     }
   }, []);
 
   return (
-    <React.Fragment style={{ marginTop: '20rpx', marginLeft: '10rpx' }}>
-      <h1 className='title'>Set Security Strategy </h1>
-      <br />
-      <Tab tab={tab} />
-      <CardBox count1={count1 - 1} style={{ marginBottom: '20px' }}></CardBox>
-      {(objectiveData || []).map((objective, index) => (
-        <CardBox data={objective} key={index} index={index} />
-      ))}
-      <Button
-        variant='contained'
-        style={{ display: 'flex', marginLeft: 'auto', backgroundColor: '#25397D', marginTop: '5px', color: 'white' }}
-        onClick={handleMeasureAdd}
-      >
-        {console.log(objectives)}
-        <AddCircleIcon style={{ margin: '0 3px' }}></AddCircleIcon>
-        Add Objective
-      </Button>
+    <React.Fragment>
+      <div style={{ marginTop: '20rpx', marginLeft: '10rpx' }}>
+        <h1 className='title'>Set Security Strategy </h1>
+        <br />
+        <Tab tab={tab} />
+        {console.log(objectiveData)}
+        {!objectiveData.length ? (
+          <CardBox style={{ marginBottom: '20px' }}></CardBox>
+        ) : (
+          <React.Fragment>
+            {(objectiveData || []).map((objective, index) => (
+              <CardBox objective={objective} key={index + 1} index={index} />
+            ))}
+          </React.Fragment>
+        )}
+        <Button
+          variant='contained'
+          style={{ display: 'flex', marginLeft: 'auto', backgroundColor: '#25397D', marginTop: '5px', color: 'white' }}
+          onClick={handleObjectiveAdd}
+        >
+          {/* {console.log(objectives)} */}
+          <AddCircleIcon style={{ margin: '0 3px' }}></AddCircleIcon>
+          Add Objective
+        </Button>
+      </div>
     </React.Fragment>
   );
 };
